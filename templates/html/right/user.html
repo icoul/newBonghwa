@@ -1,0 +1,82 @@
+<div id="active_list">
+    <div v-text="count"></div>
+    <div v-for="member in members">
+        <div style="cursor: pointer;" v-text="member" @click="send_firewood(member)"></div>
+    </div>
+</div>
+
+<script>
+    var active = new Vue({
+        el: '#active_list',
+        data: {
+            count : 0,
+            members : [],
+        },
+        methods: {
+            send_firewood: function(value){
+                var target = '@' + value
+                var text = document.getElementById("id_contents").value
+
+                document.getElementById("id_contents").value = target + ' ' + text
+            }
+        }
+    })
+
+    jQuery(document).ready(function($) {
+        var ws4redis = WS4Redis({
+            uri: 'ws://localhost:8000/ws/foobar?subscribe-broadcast&publish-broadcast&echo',
+            connecting: on_connecting,
+            connected: on_connected,
+            disconnected: on_disconnected,
+        });
+
+        // attach this function to an event handler on your site
+        function sendMessage() {
+            ws4redis.send_message('A message');
+        }
+
+        function on_connecting() {
+            console.log('Websocket is connecting...');
+        }
+
+        function on_connected() {
+            ws4redis.send_message('Hello');
+            
+            $.ajaxSetup({
+                beforeSend(xhr, settings) {
+                    xhr .setRequestHeader ( "X-CSRFToken" ,  "{{ csrf_token }}" );
+                }
+            });
+            $.post('{% url "bonghwa:activeSession" %}', {
+                user_id: '{{ username }}'
+            }).done(function(){
+                getSession();
+            });
+        }
+
+        function on_disconnected(evt) {
+            clearTimeout(loopGetSession);
+            $.ajaxSetup({
+                beforeSend(xhr, settings) {
+                    xhr .setRequestHeader ( "X-CSRFToken" ,  "{{ csrf_token }}" );
+                }
+            });
+            $.post('{% url "bonghwa:deactiveSession" %}', {
+                user_id: '{{ username }}'
+            })
+            console.log('Websocket was disconnected: ' + JSON.stringify(evt));
+        }
+
+        var loopGetSession = null;
+
+        function getSession(){
+            loopGetSession = setTimeout(function(){
+                $.get('{% url "bonghwa:getSession" %}', function(data){
+                    active.count = data.list.length
+                    active.members = data.list
+                    getSession();
+                })
+            }, 3000);
+        }
+    });
+</script>

@@ -1,0 +1,31 @@
+{% extends 'html/index.html' %}
+
+{% block login %}
+
+<h2>로그인</h2>
+
+<div id="loginCont">
+    <form method="post" action="{% url 'bonghwa:authentication' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="로그인" />
+    </form>
+        <input @click="signup" type="button" value="회원가입" />
+        <input @click="pass_change" type="button" value="비밀번호 찾기" />
+    <p>{{ error }}</p>
+</div>
+
+<script>
+    new Vue({
+        el: '#loginCont',
+        methods: {
+            signup: function(){
+                location.href="/signup/";
+            },
+            pass_change: function(){
+                location.href="/passChg/"
+            },
+        }
+    })
+</script>
+{% endblock %}

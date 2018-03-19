@@ -1,0 +1,66 @@
+{% extends 'html/index.html' %}
+
+{% block header %}
+<div id="header">
+    <div id="left_header">
+        <ul>
+            <li @click="set_contents('all', '1')">전체</li>
+            <li @click="set_contents('to', '1')">보낸멘션</li>
+            <li @click="set_contents('from', '1')">받은멘션</li>
+        </ul>
+    </div>
+    <div id="right_header">
+        <ul>
+            <li onClick="javascript:location.href='/logout'">로그아웃</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    var firewoodGetter = new Vue({
+        el: '#header',
+        data: {
+            api: 'all',
+            cpage: '1',
+        },
+        created (){
+            this.get_contents()
+            this.handleScroll()
+        },
+        methods: {
+            set_contents (api, cpage){
+                this.api = api
+                this.cpage = cpage
+                this.get_contents()
+            },
+            get_contents (){
+                /* using JSONPlaceholder */
+                const baseURI = 'http://127.0.0.1:8000';
+                this.$http.get(`${baseURI}/api/${this.api}/cpage/${this.cpage}`)
+                .then((result) => {
+                    firewood.last_index = result.data.contentList[0].created_date
+                    firewood.all_contents = result.data.contentList
+                    this.$nextTick(function(){
+                        if(this.api == 'all'){
+                            firewood.get_new_firewood_count()
+                        }
+                    });
+                })
+            },
+            handleScroll () {
+                window.addEventListener('scroll', function(event){
+                    var s = window.pageYOffset
+                    var h = window.innerHeight
+                    var b = document.documentElement.scrollHeight
+                    
+                    if(Number(s) + h < b - 1){
+                        firewoodGetter.cpage += 1
+                        firewoodGetter.get_contents()
+                    }
+                })
+            },
+        }
+    })
+
+</script>
+{% endblock %}

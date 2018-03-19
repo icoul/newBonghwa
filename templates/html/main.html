@@ -1,0 +1,157 @@
+{% extends 'html/right.html' %}
+
+{% block main %}
+    <div id="left">
+        <div class="main_text_cont">
+            <form id="insert_form" action="{% url 'bonghwa:insertContents' %}" method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                {{ form.contents }}
+                {{ form.file }}
+                {{ form.mention_index }}
+                {{ form.mention_order }}
+                <div style="position: relative;">
+                    <button id="submit_btn" type="submit">등록</button>
+                    <span onClick="javascript:document.getElementById('id_file').click()" 
+                        id="imagebutton">이미지</span>
+                    <span id="imagename" name="imagename" v-text="select_img"></span>
+                </div>
+            </form>
+        </div>
+        <div v-if="new_firewood_count > 0" @click="get_new_firewood()">
+            <p v-text="new_firewood_count_view"></p>
+        </div>
+        <div class="main_content_cont" v-for="(content, index) in all_contents" :key="content.id">
+            <div class="content_id" >
+                <span class="content_id_val"
+                      @click="send_firewood(content.username, content.id, content.mention_index, content.mention_order)"
+                      v-text="content.username">
+                </span>
+            </div>
+            <div class="content_content" id="content">
+                 <span @click="open_mention(index)" v-html="set_firewood(content.contents)"></span>
+                 <span v-if="content.image != null && content.image != ''" 
+                       @click="open_image(content.image, index)"
+                       style="color:blue;">[이미지]</span>
+            </div>
+            <div class="content_reg_date" v-text="set_date(content.created_date)"></div>
+            <div class="btn_delete" @click="delete_firewood(content.id)">[x]</div>
+            <div class="mention_cont close" @click="open_mention(index)" v-html="content.mention"></div>
+            <div class="image_cont close" @click="close_image()"></div>
+        </div>
+    </div>
+    
+    <script>
+        var firewood = new Vue({
+            el: '#left',
+            data: {
+                firewood_id : '',
+                firewooded: '',
+                username: '{{ username }}',
+                all_contents: [],
+                new_contents: [],
+                last_index: '',
+                new_firewood_count: 0,
+                new_firewood_count_view: '',
+                select_img: ''
+            },
+            methods: {
+                send_firewood: function(value, id, mention_index, mention_order){
+                    this.firewood_id = '@' + value + ' ' + this.firewood_id
+
+                    if(mention_order == 0){
+                        document.getElementById('id_mention_index').value = (id)
+                    }
+                    else {
+                        document.getElementById('id_mention_index').value = (mention_index)
+                    }
+
+                    document.getElementById('id_mention_order').value = (Number(mention_order) + 1)
+                },
+                get_new_firewood_count: function(){
+                    var index = this.last_index;
+                    setTimeout(function(){
+                        $.ajax({
+                          url:'http://127.0.0.1:8000/new/' + index + '/',
+                          type:'GET',
+                          contentType: 'application/json',
+                          data: {'created_date': this.last_index},
+                          success:function(data){
+                            if(data.length > 0){
+                                firewood.new_contents = data.concat(firewood.new_contents)
+                                firewood.last_index = data[0].created_date;
+                                firewood.new_firewood_count += data.length
+                                firewood.new_firewood_count_view = '새 멘션이 ' + firewood.new_firewood_count + '개'
+                            }
+                            firewood.get_new_firewood_count()
+                          },
+                          error:function(error){
+                            console.log(error);
+                          }
+                        });
+                    }, 10000);
+                },
+                get_new_firewood: function(){
+                    this.new_firewood_count = 0
+                    this.all_contents = this.new_contents.concat(this.all_contents)
+                    this.new_contents = []
+                },
+                set_firewood: function(value){
+                    var target = '@' + this.username
+                    var text = '<span class="targetId">' + target + '</span>'
+                    var re = new RegExp(target, 'g');
+
+                    return value.replace(re, text)
+                },
+                set_date: function(value){
+                    var date = value.substr(0, 4) + '-' + value.substr(4, 2) + '-' + value.substr(6, 2) + ' ' + value.substr(8, 2) + ':' + value.substr(10, 2) + ':' + value.substr(12, 2)
+                    return date
+                },
+                delete_firewood: function(id){
+                    $.ajaxSetup({
+                        beforeSend(xhr, settings) {
+                            xhr .setRequestHeader ( "X-CSRFToken" ,  "{{ csrf_token }}" );
+                        }
+                    });
+
+                    $.ajax({
+                      url:'http://127.0.0.1:8000/api/deleteConts/' + id + '/',
+                      type:'DELETE',
+                      data:{'id': id},
+                      success:function(response){
+                        firewood.get_contents();
+                      },
+                      error:function(error){
+                        console.log(error);
+                      }
+                    });
+                },
+                open_mention: function(index){
+                    var target = document.getElementsByClassName('mention_cont')[index]
+                    var className = target.className
+
+                    target.className = (className == 'mention_cont close')?'mention_cont open':'mention_cont close'
+                },
+                onChangeImg: function(e){
+                    var files = e.target.files || e.dataTransfer.files;
+                    
+                    if (!files.length) {
+                        return;
+                    }
+                    
+                    this.select_img = files[0].name;
+                },
+                open_image: function(image, index){
+                    var target = document.getElementsByClassName('image_cont')[index]
+                    var className = target.className
+                    var html = target.innerHTML
+
+                    if(html == null || html == ''){
+                        target.innerHTML = '<img src="/media/' + image + '" />'
+                    }
+
+                    target.className = (className == 'image_cont close')?'image_cont open':'image_cont close'
+                },
+            }
+        })
+    </script>
+{% endblock main %}

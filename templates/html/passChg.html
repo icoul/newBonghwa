@@ -1,0 +1,34 @@
+{% extends 'html/index.html' %}
+
+{% block passChg %}
+
+<div id="passChg_cont">
+    <h2>비밀번호 변경</h2>
+    <form method="post" url="{% url 'bonghwa:passChg' %}">
+        {% csrf_token %}
+        <p>id: <input type="text" name="username" value="" /></p>
+        <p>password: <input type="password" name="password" value="" v-model="password" /></p>
+        <p>password confirm: <input type="password" name="pass_confirm" value="" v-model="pass_confirm" /></p>
+        <input @click="pass_check" type="submit" value="비밀번호 변경" />
+    </form>
+</div>
+
+<script>
+    new Vue({
+        el: '#passChg_cont',
+        data: {
+            password: '',
+            pass_confirm: '',
+        },
+        methods: {
+            pass_check: function(e){
+                if(this.password != this.pass_confirm){
+                    alert("입력한 비밀번호가 다릅니다.");
+                    e.preventDefault();
+                    return false;
+                }
+            },
+        }
+    })
+</script>
+{% endblock %}

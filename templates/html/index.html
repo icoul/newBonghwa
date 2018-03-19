@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>BONGHWA</title>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="{% static 'js/ws4redis.js' %}"></script>
+    <script>Vue.prototype.$http = axios</script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}" >
+    <link rel="stylesheet" type="text/css" href="{% static 'css/header.css' %}" >
+</head>
+<body>
+    {% block header %}
+    {% endblock %}
+
+    {% block main %}
+    {% endblock %}
+
+    {% block right %}
+    {% endblock %}
+
+    {% block login %}
+    {% endblock %}
+
+    {% block passChg %}
+    {% endblock %}
+
+    <!-- <div id="app">
+        <router-view></router-view>
+    </div>
+    <script>
+        const router = new VueRouter({
+            routes: [
+                {
+                    path: '',
+                    component: App
+                }
+            ]
+        })
+
+        const app = new Vue({
+            router
+        }).$mount('#app')
+    </script> -->
+</body>
+</html>
