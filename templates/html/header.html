@@ -17,6 +17,7 @@
 </div>
 
 <script>
+    var ticket = false;
     var firewoodGetter = new Vue({
         el: '#header',
         data: {
@@ -25,7 +26,6 @@
         },
         created (){
             this.get_contents()
-            this.handleScroll()
         },
         methods: {
             set_contents (api, cpage){
@@ -41,26 +41,27 @@
                     firewood.last_index = result.data.contentList[0].created_date
                     firewood.all_contents = result.data.contentList
                     this.$nextTick(function(){
-                        if(this.api == 'all'){
+                        if(this.api == 'all' && this.cpage == 1){
                             firewood.get_new_firewood_count()
                         }
                     });
                 })
             },
-            handleScroll () {
-                window.addEventListener('scroll', function(event){
-                    var s = window.pageYOffset
-                    var h = window.innerHeight
-                    var b = document.documentElement.scrollHeight
-                    
-                    if(Number(s) + h < b - 1){
-                        firewoodGetter.cpage += 1
-                        firewoodGetter.get_contents()
-                    }
-                })
-            },
         }
     })
 
+    window.addEventListener('scroll', function(event){
+        var s = window.pageYOffset
+        var h = window.innerHeight
+        var b = document.documentElement.scrollHeight
+        
+        if(!ticket && Math.floor(s) + h > b - 2){
+            ticket = true;
+            firewoodGetter.cpage = Number(firewoodGetter.cpage) + 1
+            firewoodGetter.get_contents()
+
+            setTimeout(function(){ ticket = false; }, 5000)
+        }
+    })
 </script>
 {% endblock %}
