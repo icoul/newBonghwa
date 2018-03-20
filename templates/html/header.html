@@ -38,8 +38,16 @@
                 const baseURI = 'http://127.0.0.1:8000';
                 this.$http.get(`${baseURI}/api/${this.api}/cpage/${this.cpage}`)
                 .then((result) => {
+                    if(result.data.contentList.length === 0){
+                        this.cpage -= 1
+                        return false
+                    }
+
                     firewood.last_index = result.data.contentList[0].created_date
-                    firewood.all_contents = result.data.contentList
+                    for(var i in result.data.contentList){
+                        firewood.all_contents.push(result.data.contentList[i])
+                    }
+                    
                     this.$nextTick(function(){
                         if(this.api == 'all' && this.cpage == 1){
                             firewood.get_new_firewood_count()

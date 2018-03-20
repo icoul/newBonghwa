@@ -3,16 +3,15 @@
 {% block main %}
     <div id="left">
         <div class="main_text_cont">
-            <form id="insert_form" action="{% url 'bonghwa:insertContents' %}" method="post" enctype="multipart/form-data" novalidate>
+            <form id="insert_form" name="insert_form" action="{% url 'bonghwa:insertContents' %}" method="post" enctype="multipart/form-data" novalidate>
                 {% csrf_token %}
                 {{ form.contents }}
-                {{ form.file }}
+                {{ form.image }}
                 {{ form.mention_index }}
                 {{ form.mention_order }}
                 <div style="position: relative;">
                     <button id="submit_btn" type="submit">등록</button>
-                    <span onClick="javascript:document.getElementById('id_file').click()" 
-                        id="imagebutton">이미지</span>
+                    <span onClick="javascript:document.getElementById('id_image').click()" id="imagebutton">이미지</span>
                     <span id="imagename" name="imagename" v-text="select_img"></span>
                 </div>
             </form>
@@ -151,6 +150,13 @@
 
                     target.className = (className == 'image_cont close')?'image_cont open':'image_cont close'
                 },
+            }
+        })
+
+        document.addEventListener('keyup', function(e){
+            var key = e.which || e.keyCode
+            if(key === 13){
+                document.insert_form.submit();
             }
         })
     </script>

@@ -24,7 +24,7 @@ ul li {list-style: none;}
 #left .main_content_cont .mention_cont ul {width: 100%; margin-top:0px; padding-left: 0px;}
 #left .logout_cont {clear: both;}
 
-#insert_form #id_file {width: 10px; height: 10px; position: absolute; left:70px;}
+#insert_form #id_image {width: 10px; height: 10px; position: absolute; left:70px;}
 #insert_form #imagebutton {background: #eee; padding: 3px; border: 2px #bbb solid; cursor: pointer; position: absolute; left: 60px; z-index: 10;}
 #insert_form #imagename {position: absolute; left: 125px;}
 

@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-    reg_date = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
+    reg_date = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S.%f')
 
     def create(self, validated_data):
         user = User(

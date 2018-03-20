@@ -10,7 +10,7 @@ class Contents(models.Model):
     username = models.CharField(max_length=30)                   # 유저 아이디
     contents = models.CharField(max_length=150)                  # 장작 내용
     image = models.FileField(null=True)                          # 그림
-    created_date = models.CharField(max_length=14)               # 작성일
+    created_date = models.CharField(max_length=20)               # 작성일
     deleted = models.IntegerField(default=0)                     # 삭제여부
 
     def __str__(self):

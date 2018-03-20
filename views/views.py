@@ -65,8 +65,11 @@ class GetContents(generics.ListAPIView):
         cpage = self.kwargs['cpage']
         username = request.session['username']
 
+        minimum = (int(cpage) - 1) * 20
+        maximum = int(cpage) * 20
+
         if(api == 'all'):        # 전체글 가져오기
-            contentsQuery = Contents.objects.all().order_by('-created_date').values()
+            contentsQuery = Contents.objects.all().order_by('-created_date').values()[minimum:maximum]
         elif(api == 'to'):       # 내가 쓴 글만 가져오기
             contentsQuery = Contents.objects.filter(username = username).order_by('-created_date').values()
         elif(api == 'from'):     # 나에게 보낸 멘션만 가져오기
@@ -172,11 +175,11 @@ class InsertContents(TemplateView):
 
         if request.method == 'POST':
             form = ContentsForm(request.POST, request.FILES)
-            
+
             if form.is_valid():
                 today = datetime.datetime.now()
                 firewood = form.save(commit=False)
-                firewood.created_date = today.strftime('%Y%m%d%H%M%S')
+                firewood.created_date = today.strftime('%Y%m%d%H%M%S%f')
                 firewood.username = username
                 firewood.save()
             return redirect('/')
