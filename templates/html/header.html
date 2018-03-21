@@ -42,14 +42,18 @@
                         this.cpage -= 1
                         return false
                     }
+                    
+                    if(this.cpage == 1){
+                        firewood.all_contents = []
+                    }
 
-                    firewood.last_index = result.data.contentList[0].created_date
                     for(var i in result.data.contentList){
                         firewood.all_contents.push(result.data.contentList[i])
                     }
                     
                     this.$nextTick(function(){
                         if(this.api == 'all' && this.cpage == 1){
+                            firewood.last_index = result.data.contentList[0].created_date
                             firewood.get_new_firewood_count()
                         }
                     });
