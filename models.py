@@ -7,11 +7,12 @@ from django.utils import timezone
 class Contents(models.Model):
     mention_index = models.CharField(max_length=5, default='0')  # 멘션 index
     mention_order = models.CharField(max_length=5, default='0')  # 멘션 순서
-    username = models.CharField(max_length=30)                   # 유저 아이디
-    contents = models.CharField(max_length=150)                  # 장작 내용
-    image = models.FileField(null=True)                          # 그림
-    created_date = models.CharField(max_length=20)               # 작성일
-    deleted = models.IntegerField(default=0)                     # 삭제여부
+    username      = models.CharField(max_length=30)              # 유저 아이디
+    contents      = models.CharField(max_length=150)             # 장작 내용
+    image         = models.FileField(null=True)                  # 그림
+    created_date  = models.CharField(max_length=20)              # 작성일
+    dm            = models.IntegerField(default=0)               # DM여부
+    deleted       = models.IntegerField(default=0)               # 삭제여부
 
     def __str__(self):
         return self.contents
