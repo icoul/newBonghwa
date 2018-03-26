@@ -17,6 +17,8 @@ from rest_framework.generics import GenericAPIView
 from ws4redis.redis_store import RedisMessage
 from ws4redis.publisher import RedisPublisher
 
+import re
+
 list = []   #접속자 리스트?
 
 # class LoginSession(TemplateView):
@@ -71,19 +73,28 @@ class GetContents(generics.ListAPIView):
         if(api == 'all'):        # 전체글 가져오기
             contentsQuery = Contents.objects.all().order_by('-created_date').values()[minimum:maximum]
         elif(api == 'to'):       # 내가 쓴 글만 가져오기
-            contentsQuery = Contents.objects.filter(username = username).order_by('-created_date').values()
+            contentsQuery = Contents.objects.filter(username = username).order_by('-created_date').values()[minimum:maximum]
         elif(api == 'from'):     # 나에게 보낸 멘션만 가져오기
-            contentsQuery = Contents.objects.filter(contents__contains = ('@' + username)).order_by('-created_date').values()   
+            contentsQuery = Contents.objects.filter(Q(contents__contains = ('@' + username)) | \
+                            Q(contents__contains = ('!' + username))).order_by('-created_date').values()[minimum:maximum]
         
-        contentList = createMention(contentsQuery)
+        contentList = createMention(contentsQuery, username)
         
         return JsonResponse({'contentList': contentList})
 
 
-def createMention(contents):
+def createMention(contents, username):
     contentList = []
+    pattern = re.compile('\![\u3131-\u3163\uac00-\ud7a3\w]+')
+    nameP = re.compile('\!' + username)
 
     for query in contents:
+        m = pattern.match(query['contents'])
+        n = nameP.match(query['contents'])
+
+        if m and not n:
+            continue
+
         mention_id = query['id']
         mention_index = query['mention_index']
         mention_order = query['mention_order']
