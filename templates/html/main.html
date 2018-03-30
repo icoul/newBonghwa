@@ -69,12 +69,11 @@
                 get_new_firewood_count: function(){
                     var index = this.last_index;
                     setTimeout(function(){
-                        $.ajax({
-                          url:'http://127.0.0.1:8000/new/' + index + '/',
-                          type:'GET',
-                          contentType: 'application/json',
-                          data: {'created_date': this.last_index},
-                          success:function(data){
+                        const baseURI = 'http://127.0.0.1:8000';
+                        axios.get(`${baseURI}/new/${index}`)
+                        .then((result) => {
+                            var data = result.data.contentList;
+                            console.log(data)
                             if(data.length > 0){
                                 firewood.new_contents = data.concat(firewood.new_contents)
                                 firewood.last_index = data[0].created_date;
@@ -82,10 +81,6 @@
                                 firewood.new_firewood_count_view = '새 멘션이 ' + firewood.new_firewood_count + '개'
                             }
                             firewood.get_new_firewood_count()
-                          },
-                          error:function(error){
-                            console.log(error);
-                          }
                         });
                     }, 10000);
                 },

@@ -83,6 +83,16 @@ class GetContents(generics.ListAPIView):
         return JsonResponse({'contentList': contentList})
 
 
+class Newfirewood(generics.ListAPIView):
+    def get(self, request, *args, **kwargs):
+        username = request.session['username']
+        created_date = self.kwargs['created_date']
+        contentsQuery = Contents.objects.filter(created_date__gt=created_date).values()
+        contentList = createMention(contentsQuery, username)
+
+        return JsonResponse({'contentList': contentList})
+
+
 def createMention(contents, username):
     contentList = []
     pattern = re.compile('\![\u3131-\u3163\uac00-\ud7a3\w]+')
@@ -114,16 +124,6 @@ def createMention(contents, username):
         contentList.append(query)
 
     return contentList
-
-
-class Newfirewood(generics.ListAPIView):
-    serializer_class = ContentsSerializer
-
-    def get_queryset(self):
-        print(self.kwargs)
-        created_date = self.kwargs['created_date']
-
-        return Contents.objects.filter(created_date__gt=created_date)
 
 
 class DeleteContents(GenericAPIView, mixins.ListModelMixin):
