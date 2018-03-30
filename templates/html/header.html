@@ -36,7 +36,7 @@
             get_contents (){
                 /* using JSONPlaceholder */
                 const baseURI = 'http://127.0.0.1:8000';
-                this.$http.get(`${baseURI}/api/${this.api}/cpage/${this.cpage}`)
+                axios.get(`${baseURI}/api/${this.api}/cpage/${this.cpage}`)
                 .then((result) => {
                     if(result.data.contentList.length === 0){
                         this.cpage -= 1
